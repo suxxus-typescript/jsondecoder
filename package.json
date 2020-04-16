@@ -13,8 +13,9 @@
     "prettier:ts": "prettier --parser typescript --config .prettierrc --write \"src/**/*.{ts,tsx}\""
   },
   "lint-staged": {
-    "*.+(tsx|ts)": [
-      "prettier:ts"
+    "*.{tsx,ts}": [
+      "npm run prettier:ts",
+      "npm run lint"
     ]
   },
   "author": "suxxus",
@@ -32,7 +33,9 @@
     "tslint-plugin-prettier": "^2.3.0",
     "typescript": "^3.8.3"
   },
-  "dependencies": {},
+  "dependencies": {
+    "json-decoder": "^1.3.4"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

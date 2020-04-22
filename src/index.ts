@@ -47,3 +47,94 @@ const toDecodedUser = (r: D.Result<User>) => {
 
 console.log(user);
 console.log('user type result: ', toDecodedUser(user));
+
+// links
+type LinksHref = {
+  href: string;
+};
+
+type LinksSelf = {
+  self: LinksHref;
+};
+
+type Links = {
+  _links: LinksSelf;
+};
+
+const jsonLinks = {
+  _links: {
+    self: {
+      href: '/orders/v1/486733',
+    },
+  },
+};
+
+const linksHrefDecoder = D.objectDecoder<LinksHref>({
+  href: D.stringDecoder,
+});
+
+const linksSelfDecoder = D.objectDecoder<LinksSelf>({
+  self: linksHrefDecoder,
+});
+
+const linksDecoder = D.objectDecoder<Links>({
+  _links: linksSelfDecoder,
+});
+
+const toDecodeLinks = (r: D.Result<Links>) => {
+  switch (r.type) {
+    case 'OK':
+      return r.value;
+    case 'ERR':
+      return r.message;
+  }
+};
+
+console.log('links type result', toDecodeLinks(linksDecoder.decode(jsonLinks)));
+
+// Orders
+
+type Order = {
+  order: string;
+  _links: LinksSelf;
+};
+
+type Orders = {
+  content: Order[];
+};
+
+const jsonOrders = {
+  content: [
+    {
+      order: 'xxx',
+      _links: {
+        self: {
+          href: 'orders/xxx/v1',
+        },
+      },
+    },
+  ],
+};
+
+const orderDecoder = D.objectDecoder<Order>({
+  order: D.stringDecoder,
+  _links: linksSelfDecoder,
+});
+
+const ordersDecoder = D.objectDecoder<Orders>({
+  content: D.arrayDecoder(orderDecoder),
+});
+
+const toDecodeOrders = (r: D.Result<Orders>) => {
+  switch (r.type) {
+    case 'OK':
+      return r.value;
+    case 'ERR':
+      return r.message;
+  }
+};
+
+console.log(
+  'orders type result:',
+  JSON.stringify(toDecodeOrders(ordersDecoder.decode(jsonOrders))),
+);

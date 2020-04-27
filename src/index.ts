@@ -138,3 +138,51 @@ console.log(
   'orders type result:',
   JSON.stringify(toDecodeOrders(ordersDecoder.decode(jsonOrders))),
 );
+
+// -------------------------
+
+type Exp = { exp: string };
+
+type UrlParse = {
+  pathNames: string[];
+  queryParams: Exp;
+};
+
+const urlParse = {
+  pathNames: ['xxx', '000'],
+  queryParams: { exp: 'xxx' },
+};
+
+const pathNamesDecoder = D.arrayDecoder(D.stringDecoder);
+const queryParamsDecoder = D.objectDecoder<Exp>({ exp: D.stringDecoder });
+
+const urlParseDecoder = D.objectDecoder<UrlParse>({
+  queryParams: D.objectDecoder<Exp>({ exp: D.stringDecoder }),
+  pathNames: D.arrayDecoder(D.stringDecoder),
+});
+
+const toDecodeUrlParse = (r: D.Result<UrlParse>) => {
+  switch (r.type) {
+    case 'OK':
+      return r.value;
+    case 'ERR':
+      return r.message;
+  }
+};
+
+console.log(
+  'pathNames type result',
+  pathNamesDecoder.decode(urlParse.pathNames),
+);
+
+console.log(
+  'queryParams type result',
+  queryParamsDecoder.decode({ exp: '44444' }).map(({ exp }) => Number(exp)),
+);
+
+console.log('urlParseDecoder type result', urlParseDecoder.decode(urlParse));
+
+console.log(
+  'toDecodeUrlParse ',
+  toDecodeUrlParse(urlParseDecoder.decode(urlParse)),
+);
